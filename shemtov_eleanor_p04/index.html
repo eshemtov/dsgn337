@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <title>Chicago Murals & Community</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css' rel='stylesheet'/>
+
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+h2 {
+  margin: 10px;
+  font-size: 1.5em;
+  font-family: inter-regular;
+}
+
+h3 {
+  font-size: 1em;
+  margin: 10px;
+  font-family: inter-regular;
+}
+
+p {
+  font-size: 0.94em;
+  margin: 10px;
+  font-family: inter-regular;
+}
+
+@font-face {
+  font-family: inter-regular;
+  src: url("Inter-Regular.otf");
+}
+
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.map-overlay {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.8);
+  margin-right: 20px;
+  font-family: inter-regular, sans-serif;
+  overflow: auto;
+  border-radius: 3px;
+}
+
+#features {
+  top: 0;
+  height: 270px;
+  margin-top: 20px;
+  width: 375px;
+}
+
+#legend {
+  padding: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  line-height: 18px;
+  height: 150px;
+  margin-bottom: 40px;
+  width: 150px;
+  font-family: inter-regular;
+}
+
+.legend-key {
+  display: inline-block;
+  border-radius: 20%;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  font-family: inter-regular;
+}
+
+.mapboxgl-popup-content {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+</style>
+</head>
+
+<body>
+
+<div id='map'></div>
+<div class='map-overlay' id='features'><h2>Murals & Landmark District Locations in Chicago's Community Areas</h2><div id='pd'><p>Murals build a sense of community in the areas in which they’re painted and can bring economic revitalization to neighborhoods. This visualization looks at the locations of murals in Chicago from 1971-2020 across Chicago's 77 community areas, in an effort to see what the locations can tell us about the communities living there. Click on the points to learn more about these murals. </p></div></div>
+
+<div class='map-overlay' id='legend'></div>
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiZXNoZW10b3YiLCJhIjoiY2ttbW5seGQ1MW1ocDJubzR0c203ajhjZyJ9.1TV421t7ejNrUx6tTovYiw';
+var map = new mapboxgl.Map({
+container: 'map',
+style: 'mapbox://styles/eshemtov/ckof5v24e0lay18o4dahubesl',
+});
+
+var popup = new mapboxgl.Popup({
+    closeButton: false
+});
+
+map.on('load', function() {
+  var layers = ['1971-1979', '1980-1989', '1990-1999', '2000-2009', '2010-2020', 'landmark districts', 'community area boundaries'];
+  var colors = ['#ffffff', '#f4f40b', '#88e78a', '#00ccb1','#207daa','#8f9491', '#a9c5a5'];
+
+for (i = 0; i < layers.length; i++) {
+  var layer = layers[i];
+  var color = colors[i];
+  var item = document.createElement('div');
+  var key = document.createElement('span');
+  key.className = 'legend-key';
+  key.style.backgroundColor = color;
+
+  var value = document.createElement('span');
+  value.innerHTML = layer;
+  item.appendChild(key);
+  item.appendChild(value);
+  legend.appendChild(item);
+}
+
+map.on('click', function (e) {
+  map.getCanvas().style.cursor = 'pointer';
+    var features = map.queryRenderedFeatures(e.point, { layers: ['mural-locations'] });
+
+    if (!features.length) {
+        return;
+    }
+
+    var feature = features[0];
+
+        popup.setLngLat(feature.geometry.coordinates)
+        .setHTML('<h3>Title: ' + feature.properties.artworktitle + '</h3><h3>Artist: '+  feature.properties.artistcredit + '</h3><h3>Description: ' + feature.properties.description +'</h3>')
+        .addTo(map);
+});
+
+});
+
+
+</script>
+
+</body>
+</html>
